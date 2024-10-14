@@ -192,6 +192,10 @@ export class GraphNode {
         }
     }
 
+    public get rootElement() {
+        return this._visual;
+    }
+
     public constructor(
         public content: INodeData,
         stateManager: StateManager
@@ -383,7 +387,8 @@ export class GraphNode {
         this._comments.innerHTML = this.content.comments || "";
         this._comments.title = this.content.comments || "";
 
-        this._executionTime.innerHTML = `${(this.content.executionTime || 0).toFixed(2)} ms`;
+        const executionTime = this.content.executionTime || 0;
+        this._executionTime.innerHTML = executionTime >= 0 ? `${executionTime.toFixed(2)} ms` : "";
 
         this.content.prepareHeaderIcon(this._headerIcon, this._headerIconImg);
         if (this._headerIconImg.src) {
@@ -433,6 +438,7 @@ export class GraphNode {
         this._visual.releasePointerCapture(evt.pointerId);
 
         if (!this._ownerCanvas._targetLinkCandidate) {
+            this._stateManager.onNodeMovedObservable.notifyObservers(this);
             return;
         }
 
@@ -478,6 +484,7 @@ export class GraphNode {
         this._ownerCanvas.automaticRewire(availableNodeOutputs, outputs, true);
 
         this._stateManager.onRebuildRequiredObservable.notifyObservers();
+        this._stateManager.onNodeMovedObservable.notifyObservers(this);
     }
 
     private _onMove(evt: PointerEvent) {

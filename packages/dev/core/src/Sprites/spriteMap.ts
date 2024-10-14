@@ -1,4 +1,3 @@
-import { Engine } from "../Engines/engine";
 import type { IDisposable, Scene } from "../scene";
 import type { Nullable } from "../types";
 import { Vector2, Vector3 } from "../Maths/math.vector";
@@ -13,6 +12,12 @@ import { Effect } from "../Materials/effect";
 import { CreatePlane } from "../Meshes/Builders/planeBuilder";
 import "../Shaders/spriteMap.fragment";
 import "../Shaders/spriteMap.vertex";
+import { Constants } from "core/Engines/constants";
+
+export enum SpriteMapFrameRotationDirection {
+    CCW = 0,
+    CW = 1,
+}
 
 /**
  * Defines the basic options interface of a SpriteMap
@@ -62,6 +67,13 @@ export interface ISpriteMapOptions {
      * Vector3 scalar of the global RGB values of the SpriteMap.
      */
     colorMultiply?: Vector3;
+
+    /**
+     * Rotation direction of the frame by 90 degrees.
+     * Applied when the the frame's "rotated" parameter is true.
+     * Default is CCW.
+     */
+    frameRotationDirection?: SpriteMapFrameRotationDirection;
 }
 
 /**
@@ -147,6 +159,24 @@ export class SpriteMap implements ISpriteMap {
         this._material.setTexture("animationMap", this._animationMap);
     }
 
+    /** Gets or sets a boolean indicating if the sprite map must consider scene fog when rendering */
+    public get fogEnabled(): boolean {
+        return this._material.fogEnabled;
+    }
+    public set fogEnabled(value: boolean) {
+        this._material.fogEnabled = value;
+    }
+
+    protected _useLogarithmicDepth: boolean;
+
+    /** Gets or sets a boolean indicating if the sprite map must use logarithmic depth when rendering */
+    public get useLogarithmicDepth(): boolean {
+        return this._material.useLogarithmicDepth;
+    }
+    public set useLogarithmicDepth(value: boolean) {
+        this._material.useLogarithmicDepth = value;
+    }
+
     /** Scene that the SpriteMap was created in */
     private _scene: Scene;
 
@@ -211,6 +241,10 @@ export class SpriteMap implements ISpriteMap {
         const defines = [];
         defines.push("#define LAYERS " + options.layerCount);
 
+        if (options?.frameRotationDirection === SpriteMapFrameRotationDirection.CW) {
+            defines.push("#define FR_CW");
+        }
+
         if (options.flipU) {
             defines.push("#define FLIPU");
         }
@@ -246,7 +280,21 @@ export class SpriteMap implements ISpriteMap {
             {
                 defines,
                 attributes: ["position", "normal", "uv"],
-                uniforms: ["worldViewProjection", "time", "stageSize", "outputSize", "spriteMapSize", "spriteCount", "time", "colorMul", "mousePosition", "curTile", "flipU"],
+                uniforms: [
+                    "world",
+                    "view",
+                    "projection",
+                    "time",
+                    "stageSize",
+                    "outputSize",
+                    "spriteMapSize",
+                    "spriteCount",
+                    "time",
+                    "colorMul",
+                    "mousePosition",
+                    "curTile",
+                    "flipU",
+                ],
                 samplers: ["spriteSheet", "frameMap", "tileMaps", "animationMap"],
                 needAlphaBlending: true,
             }
@@ -299,6 +347,16 @@ export class SpriteMap implements ISpriteMap {
 
         this._scene.onBeforeRenderObservable.add(obfunction);
         this._output.material = this._material;
+    }
+
+    /**
+     * Returns the index of the frame for a given filename
+     * @param name filename of the frame
+     * @returns index of the frame
+     */
+    public getTileIdxByName(name: string): number {
+        const idx = this.atlasJSON.frames.findIndex((f) => f.filename === name);
+        return idx;
     }
 
     /**
@@ -385,7 +443,7 @@ export class SpriteMap implements ISpriteMap {
 
         const floatArray = new Float32Array(data);
 
-        const t = RawTexture.CreateRGBATexture(floatArray, this.spriteCount, 4, this._scene, false, false, Texture.NEAREST_NEAREST, Engine.TEXTURETYPE_FLOAT);
+        const t = RawTexture.CreateRGBATexture(floatArray, this.spriteCount, 4, this._scene, false, false, Texture.NEAREST_NEAREST, Constants.TEXTURETYPE_FLOAT);
 
         return t;
     }
@@ -417,7 +475,7 @@ export class SpriteMap implements ISpriteMap {
         }
 
         const floatArray = new Float32Array(data);
-        const t = RawTexture.CreateRGBATexture(floatArray, _tx, _ty, this._scene, false, false, Texture.NEAREST_NEAREST, Engine.TEXTURETYPE_FLOAT);
+        const t = RawTexture.CreateRGBATexture(floatArray, _tx, _ty, this._scene, false, false, Texture.NEAREST_NEAREST, Constants.TEXTURETYPE_FLOAT);
 
         return t;
     }
@@ -487,7 +545,7 @@ export class SpriteMap implements ISpriteMap {
             false,
             false,
             Texture.NEAREST_NEAREST,
-            Engine.TEXTURETYPE_FLOAT
+            Constants.TEXTURETYPE_FLOAT
         );
 
         return t;

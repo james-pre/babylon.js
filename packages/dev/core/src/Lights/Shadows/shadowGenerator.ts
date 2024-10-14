@@ -1041,8 +1041,9 @@ export class ShadowGenerator implements IShadowGenerator {
             if (shadowMap) {
                 this._scene.postProcessManager.directRender(this._blurPostProcesses, shadowMap.renderTarget, true);
                 engine.unBindFramebuffer(shadowMap.renderTarget!, true);
-                engine._debugPopGroup?.(1);
             }
+
+            engine._debugPopGroup?.(1);
         });
 
         // Clear according to the chosen filter.
@@ -1161,7 +1162,12 @@ export class ShadowGenerator implements IShadowGenerator {
                 engine,
                 false,
                 "#define OFFSET " + this._blurBoxOffset,
-                this._textureType
+                this._textureType,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                this._shaderLanguage
             );
             this._boxBlurPostprocess.externalTextureSamplerBinding = true;
             this._boxBlurPostprocess.onApplyObservable.add((effect) => {
@@ -1331,9 +1337,9 @@ export class ShadowGenerator implements IShadowGenerator {
                 }
 
                 // Baked vertex animations
-                const bvaManager = (<Mesh>subMesh.getMesh()).bakedVertexAnimationManager;
-                if (hardwareInstancedRendering && bvaManager && bvaManager.isEnabled) {
-                    bvaManager.bind(effect, true);
+                const bvaManager = subMesh.getMesh().bakedVertexAnimationManager;
+                if (bvaManager && bvaManager.isEnabled) {
+                    bvaManager.bind(effect, hardwareInstancedRendering);
                 }
 
                 // Clip planes
@@ -1652,10 +1658,12 @@ export class ShadowGenerator implements IShadowGenerator {
             }
 
             // Baked vertex animations
-            const bvaManager = (<Mesh>mesh).bakedVertexAnimationManager;
-            if (useInstances && bvaManager && bvaManager.isEnabled) {
+            const bvaManager = mesh.bakedVertexAnimationManager;
+            if (bvaManager && bvaManager.isEnabled) {
                 defines.push("#define BAKED_VERTEX_ANIMATION_TEXTURE");
-                attribs.push("bakedVertexAnimationSettingsInstanced");
+                if (useInstances) {
+                    attribs.push("bakedVertexAnimationSettingsInstanced");
+                }
             }
 
             // Get correct effect

@@ -8,9 +8,7 @@ import { Constants } from "../Engines/constants";
 import type { Scene } from "../scene";
 import { PostProcess } from "../PostProcesses/postProcess";
 import type { AbstractEngine } from "../Engines/abstractEngine";
-
-import "../Shaders/lod.fragment";
-import "../Shaders/lodCube.fragment";
+import { ShaderLanguage } from "core/Materials";
 
 /**
  * Uses the GPU to create a copy texture rescaled at a given size
@@ -63,22 +61,24 @@ export function CreateResizedCopy(texture: Texture, width: number, height: numbe
         Constants.TEXTURETYPE_UNSIGNED_INT
     );
     passPostProcess.externalTextureSamplerBinding = true;
-    passPostProcess.getEffect().executeWhenCompiled(() => {
-        passPostProcess.onApply = function (effect) {
-            effect.setTexture("textureSampler", texture);
-        };
+    passPostProcess.onEffectCreatedObservable.addOnce((e) => {
+        e.executeWhenCompiled(() => {
+            passPostProcess.onApply = function (effect) {
+                effect.setTexture("textureSampler", texture);
+            };
 
-        const internalTexture = rtt.renderTarget;
+            const internalTexture = rtt.renderTarget;
 
-        if (internalTexture) {
-            scene.postProcessManager.directRender([passPostProcess], internalTexture);
+            if (internalTexture) {
+                scene.postProcessManager.directRender([passPostProcess], internalTexture);
 
-            engine.unBindFramebuffer(internalTexture);
-            rtt.disposeFramebufferObjects();
-            passPostProcess.dispose();
+                engine.unBindFramebuffer(internalTexture);
+                rtt.disposeFramebufferObjects();
+                passPostProcess.dispose();
 
-            rtt.getInternalTexture()!.isReady = true;
-        }
+                rtt.getInternalTexture()!.isReady = true;
+            }
+        });
     });
 
     return rtt;
@@ -139,30 +139,32 @@ export function ApplyPostProcess(
             }
         );
 
-        postProcess.getEffect().executeWhenCompiled(() => {
-            // PP Render Pass
-            postProcess.onApply = (effect) => {
-                effect._bindTexture("textureSampler", internalTexture);
-                effect.setFloat2("scale", 1, 1);
-            };
-            scene.postProcessManager.directRender([postProcess!], encodedTexture, true);
+        postProcess.onEffectCreatedObservable.addOnce((e) => {
+            e.executeWhenCompiled(() => {
+                // PP Render Pass
+                postProcess.onApply = (effect) => {
+                    effect._bindTexture("textureSampler", internalTexture);
+                    effect.setFloat2("scale", 1, 1);
+                };
+                scene.postProcessManager.directRender([postProcess!], encodedTexture, true);
 
-            // Cleanup
-            engine.restoreDefaultFramebuffer();
-            engine._releaseTexture(internalTexture);
-            if (postProcess) {
-                postProcess.dispose();
-            }
+                // Cleanup
+                engine.restoreDefaultFramebuffer();
+                engine._releaseTexture(internalTexture);
+                if (postProcess) {
+                    postProcess.dispose();
+                }
 
-            // Internal Swap
-            encodedTexture._swapAndDie(internalTexture);
+                // Internal Swap
+                encodedTexture._swapAndDie(internalTexture);
 
-            // Ready to get rolling again.
-            internalTexture.type = type!;
-            internalTexture.format = Constants.TEXTUREFORMAT_RGBA;
-            internalTexture.isReady = true;
+                // Ready to get rolling again.
+                internalTexture.type = type!;
+                internalTexture.format = Constants.TEXTUREFORMAT_RGBA;
+                internalTexture.isReady = true;
 
-            resolve(internalTexture);
+                resolve(internalTexture);
+            });
         });
     });
 }
@@ -240,18 +242,45 @@ const ProcessAsync = async (texture: BaseTexture, width: number, height: number,
     const scene = texture.getScene()!;
     const engine = scene.getEngine();
 
+    if (!engine.isWebGPU) {
+        if (texture.isCube) {
+            await import("../Shaders/lodCube.fragment");
+        } else {
+            await import("../Shaders/lod.fragment");
+        }
+    } else {
+        if (texture.isCube) {
+            await import("../ShadersWGSL/lodCube.fragment");
+        } else {
+            await import("../ShadersWGSL/lod.fragment");
+        }
+    }
+
     let lodPostProcess: PostProcess;
 
     if (!texture.isCube) {
-        lodPostProcess = new PostProcess("lod", "lod", ["lod", "gamma"], null, 1.0, null, Texture.NEAREST_NEAREST_MIPNEAREST, engine);
+        lodPostProcess = new PostProcess("lod", "lod", {
+            uniforms: ["lod", "gamma"],
+            samplingMode: Texture.NEAREST_NEAREST_MIPNEAREST,
+            engine,
+            shaderLanguage: engine.isWebGPU ? ShaderLanguage.WGSL : ShaderLanguage.GLSL,
+        });
     } else {
         const faceDefines = ["#define POSITIVEX", "#define NEGATIVEX", "#define POSITIVEY", "#define NEGATIVEY", "#define POSITIVEZ", "#define NEGATIVEZ"];
-        lodPostProcess = new PostProcess("lodCube", "lodCube", ["lod", "gamma"], null, 1.0, null, Texture.NEAREST_NEAREST_MIPNEAREST, engine, false, faceDefines[face]);
+        lodPostProcess = new PostProcess("lodCube", "lodCube", {
+            uniforms: ["lod", "gamma"],
+            samplingMode: Texture.NEAREST_NEAREST_MIPNEAREST,
+            engine,
+            defines: faceDefines[face],
+            shaderLanguage: engine.isWebGPU ? ShaderLanguage.WGSL : ShaderLanguage.GLSL,
+        });
     }
 
     await new Promise((resolve) => {
-        lodPostProcess.getEffect().executeWhenCompiled(() => {
-            resolve(0);
+        lodPostProcess.onEffectCreatedObservable.addOnce((e) => {
+            e.executeWhenCompiled(() => {
+                resolve(0);
+            });
         });
     });
 
@@ -260,7 +289,7 @@ const ProcessAsync = async (texture: BaseTexture, width: number, height: number,
     lodPostProcess.onApply = function (effect) {
         effect.setTexture("textureSampler", texture);
         effect.setFloat("lod", lod);
-        effect.setBool("gamma", texture.gammaSpace);
+        effect.setInt("gamma", texture.gammaSpace ? 1 : 0);
     };
 
     const internalTexture = texture.getInternalTexture();

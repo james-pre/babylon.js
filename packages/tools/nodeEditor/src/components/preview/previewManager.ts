@@ -8,7 +8,6 @@ import { Vector3 } from "core/Maths/math.vector";
 import { HemisphericLight } from "core/Lights/hemisphericLight";
 import { ArcRotateCamera } from "core/Cameras/arcRotateCamera";
 import { PreviewType } from "./previewType";
-import { Animation } from "core/Animations/animation";
 import { SceneLoader } from "core/Loading/sceneLoader";
 import { TransformNode } from "core/Meshes/transformNode";
 import type { AbstractMesh } from "core/Meshes/abstractMesh";
@@ -41,7 +40,7 @@ import "core/Helpers/sceneHelpers";
 import "core/Rendering/depthRendererSceneComponent";
 import { ShaderLanguage } from "core/Materials/shaderLanguage";
 import { Engine } from "core/Engines/engine";
-
+import { Animation } from "core/Animations/animation";
 const dontSerializeTextureContent = true;
 
 /**
@@ -381,24 +380,28 @@ export class PreviewManager {
     public static DefaultEnvironmentURL = "https://assets.babylonjs.com/environments/environmentSpecular.env";
 
     private _refreshPreviewMesh(force?: boolean) {
-        switch (this._globalState.envType) {
-            case PreviewType.Room:
-                this._hdrTexture = new CubeTexture(PreviewManager.DefaultEnvironmentURL, this._scene);
-                if (this._hdrTexture) {
-                    this._prepareBackgroundHDR();
+        if (this._globalState.mode === NodeMaterialModes.Material) {
+            switch (this._globalState.envType) {
+                case PreviewType.Room:
+                    this._hdrTexture = new CubeTexture(PreviewManager.DefaultEnvironmentURL, this._scene);
+                    if (this._hdrTexture) {
+                        this._prepareBackgroundHDR();
+                    }
+                    break;
+                case PreviewType.Custom: {
+                    const blob = new Blob([this._globalState.envFile], { type: "octet/stream" });
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        const dataurl = evt.target!.result as string;
+                        this._hdrTexture = new CubeTexture(dataurl, this._scene, undefined, false, undefined, undefined, undefined, undefined, undefined, ".env");
+                        this._prepareBackgroundHDR();
+                    };
+                    reader.readAsDataURL(blob);
+                    break;
                 }
-                break;
-            case PreviewType.Custom: {
-                const blob = new Blob([this._globalState.envFile], { type: "octet/stream" });
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    const dataurl = evt.target!.result as string;
-                    this._hdrTexture = new CubeTexture(dataurl, this._scene, undefined, false, undefined, undefined, undefined, undefined, undefined, ".env");
-                    this._prepareBackgroundHDR();
-                };
-                reader.readAsDataURL(blob);
-                break;
             }
+        } else {
+            this._scene.environmentTexture = null;
         }
         if (this._currentType !== this._globalState.previewType || this._currentType === PreviewType.Custom || force) {
             this._currentType = this._globalState.previewType;
@@ -493,7 +496,7 @@ export class PreviewManager {
                         return;
                 }
             } else if (this._globalState.mode === NodeMaterialModes.ProceduralTexture) {
-                this._layer = new Layer("proceduralLayer", null, this._scene);
+                this._layer = new Layer("proceduralLayer", null, this._scene, false);
             } else if (this._globalState.mode === NodeMaterialModes.Particle) {
                 switch (this._globalState.previewType) {
                     case PreviewType.DefaultParticleSystem:

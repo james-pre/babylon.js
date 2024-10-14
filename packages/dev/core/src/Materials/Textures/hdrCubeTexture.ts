@@ -4,7 +4,7 @@ import { Matrix, Vector3 } from "../../Maths/math.vector";
 import { BaseTexture } from "../../Materials/Textures/baseTexture";
 import { Texture } from "../../Materials/Textures/texture";
 import { Constants } from "../../Engines/constants";
-import { HDRTools } from "../../Misc/HighDynamicRange/hdr";
+import { GetCubeMapTextureData } from "../../Misc/HighDynamicRange/hdr";
 import { CubeMapToSphericalPolynomialTools } from "../../Misc/HighDynamicRange/cubemapToSphericalPolynomial";
 import { RegisterClass } from "../../Misc/typeStore";
 import { Observable } from "../../Misc/observable";
@@ -13,7 +13,6 @@ import { ToGammaSpace } from "../../Maths/math.constants";
 import type { AbstractEngine } from "../../Engines/abstractEngine";
 import { HDRFiltering } from "../../Materials/Textures/Filtering/hdrFiltering";
 import { ToHalfFloat } from "../../Misc/textureTools";
-import "../../Engines/Extensions/engine.rawTexture";
 import "../../Materials/Textures/baseTexture.polynomial";
 
 /**
@@ -199,7 +198,7 @@ export class HDRCubeTexture extends BaseTexture {
             this.lodGenerationScale = 0.8;
 
             // Extract the raw linear data.
-            const data = HDRTools.GetCubeMapTextureData(buffer, this._size, this._supersample);
+            const data = GetCubeMapTextureData(buffer, this._size, this._supersample);
 
             // Generate harmonics if needed.
             if (this._generateHarmonics) {

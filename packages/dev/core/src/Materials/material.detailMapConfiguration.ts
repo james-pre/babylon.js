@@ -10,11 +10,11 @@ import { MaterialDefines } from "./materialDefines";
 import { MaterialPluginBase } from "./materialPluginBase";
 import { Constants } from "../Engines/constants";
 
-import type { Engine } from "../Engines/engine";
 import type { Scene } from "../scene";
 import type { StandardMaterial } from "./standardMaterial";
 import type { PBRBaseMaterial } from "./PBR/pbrBaseMaterial";
 import { BindTextureMatrix, PrepareDefinesForMergedUV } from "./materialHelper.functions";
+import type { AbstractEngine } from "core/Engines/abstractEngine";
 
 /**
  * @internal
@@ -88,13 +88,21 @@ export class DetailMapConfiguration extends MaterialPluginBase {
         this._internalMarkAllSubMeshesAsTexturesDirty();
     }
 
+    /**
+     * Gets a boolean indicating that the plugin is compatible with a given shader language.
+     * @returns true if the plugin is compatible with the shader language
+     */
+    public override isCompatible(): boolean {
+        return true;
+    }
+
     constructor(material: PBRBaseMaterial | StandardMaterial, addToPluginList = true) {
         super(material, "DetailMap", 140, new MaterialDetailMapDefines(), addToPluginList);
 
         this._internalMarkAllSubMeshesAsTexturesDirty = material._dirtyCallbacks[Constants.MATERIAL_TextureDirtyFlag];
     }
 
-    public override isReadyForSubMesh(defines: MaterialDetailMapDefines, scene: Scene, engine: Engine): boolean {
+    public override isReadyForSubMesh(defines: MaterialDetailMapDefines, scene: Scene, engine: AbstractEngine): boolean {
         if (!this._isEnabled) {
             return true;
         }

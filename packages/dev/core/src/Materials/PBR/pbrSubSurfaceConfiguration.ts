@@ -9,7 +9,6 @@ import type { RenderTargetTexture } from "../../Materials/Textures/renderTargetT
 import { MaterialFlags } from "../materialFlags";
 import type { UniformBuffer } from "../../Materials/uniformBuffer";
 import type { EffectFallbacks } from "../effectFallbacks";
-import { Scalar } from "../../Maths/math.scalar";
 import type { CubeTexture } from "../Textures/cubeTexture";
 import { TmpVectors } from "../../Maths/math.vector";
 import type { SubMesh } from "../../Meshes/subMesh";
@@ -350,6 +349,14 @@ export class PBRSubSurfaceConfiguration extends MaterialPluginBase {
         this._internalMarkScenePrePassDirty();
     }
 
+    /**
+     * Gets a boolean indicating that the plugin is compatible with a given shader language.
+     * @returns true if the plugin is compatible with the shader language
+     */
+    public override isCompatible(): boolean {
+        return true;
+    }
+
     constructor(material: PBRBaseMaterial, addToPluginList = true) {
         super(material, "PBRSubSurface", 130, new MaterialSubSurfaceDefines(), addToPluginList);
 
@@ -585,7 +592,7 @@ export class PBRSubSurfaceConfiguration extends MaterialPluginBase {
                 );
 
                 if (realTimeFiltering) {
-                    uniformBuffer.updateFloat2("vRefractionFilteringInfo", width, Scalar.Log2(width));
+                    uniformBuffer.updateFloat2("vRefractionFilteringInfo", width, Math.log2(width));
                 }
 
                 if ((<any>refractionTexture).boundingBoxSize) {
