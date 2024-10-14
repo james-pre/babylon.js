@@ -10,7 +10,7 @@ import { Scene } from "core/scene";
 import type { Nullable } from "core/types";
 import { TestDeviceInputSystem } from "../DeviceInput/testDeviceInputSystem";
 import { MeshBuilder } from "core/Meshes/meshBuilder";
-import { Frustum } from "core/Maths";
+import { GetPlanes, IsPointInFrustum } from "core/Maths";
 import { StandardMaterial } from "core/Materials";
 
 describe("ArcRotateCameraMouseInput", () => {
@@ -176,7 +176,7 @@ describe("ArcRotateCameraMouseInput", () => {
 
             // Get frustum planes from camera transformation matrix
             let transformMatrix = camera.getTransformationMatrix();
-            let frustumPlanes = Frustum.GetPlanes(transformMatrix);
+            let frustumPlanes = GetPlanes(transformMatrix);
 
             // Get all bounding box points and check if they are in the frustum
             // both before and after zoomOn
@@ -184,7 +184,7 @@ describe("ArcRotateCameraMouseInput", () => {
 
             // Before zoomOn
             for (const point of pointsToCheck) {
-                if (!Frustum.IsPointInFrustum(point, frustumPlanes)) {
+                if (!IsPointInFrustum(point, frustumPlanes)) {
                     outOfBoundsPoints++;
                 }
             }
@@ -195,11 +195,11 @@ describe("ArcRotateCameraMouseInput", () => {
 
             // Update frustum planes and transformation matrix
             transformMatrix = camera.getTransformationMatrix();
-            frustumPlanes = Frustum.GetPlanes(transformMatrix);
+            frustumPlanes = GetPlanes(transformMatrix);
 
             // After zoomOn
             for (const point of pointsToCheck) {
-                if (Frustum.IsPointInFrustum(point, frustumPlanes)) {
+                if (IsPointInFrustum(point, frustumPlanes)) {
                     inBoundsPoints++;
                 }
             }

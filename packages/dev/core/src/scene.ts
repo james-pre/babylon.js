@@ -51,7 +51,7 @@ import { PerfCounter } from "./Misc/perfCounter";
 import type { IFileRequest } from "./Misc/fileRequest";
 import { Color4, Color3 } from "./Maths/math.color";
 import type { Plane } from "./Maths/math.plane";
-import { Frustum } from "./Maths/math.frustum";
+import { GetPlanes, GetPlanesToRef } from "./Maths/math.frustum";
 import { UniqueIdGenerator } from "./Misc/uniqueIdGenerator";
 import type { LoadFileError, RequestFileError, ReadFileError } from "./Misc/fileTools";
 import { ReadFile, RequestFile, LoadFile } from "./Misc/fileTools";
@@ -2533,9 +2533,9 @@ export class Scene implements IAnimatable, IClipPlanesHolder, IAssetContainer {
 
         // Update frustum
         if (!this._frustumPlanes) {
-            this._frustumPlanes = Frustum.GetPlanes(this._transformMatrix);
+            this._frustumPlanes = GetPlanes(this._transformMatrix);
         } else {
-            Frustum.GetPlanesToRef(this._transformMatrix, this._frustumPlanes);
+            GetPlanesToRef(this._transformMatrix, this._frustumPlanes);
         }
 
         if (this._multiviewSceneUbo && this._multiviewSceneUbo.useUbo) {

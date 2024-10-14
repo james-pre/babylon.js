@@ -14,7 +14,7 @@ import { Logger } from "../Misc/logger";
 import { GetClass } from "../Misc/typeStore";
 import { _WarnImport } from "../Misc/devTools";
 import { Viewport } from "../Maths/math.viewport";
-import { Frustum } from "../Maths/math.frustum";
+import { GetPlanes, GetPlanesToRef } from "../Maths/math.frustum";
 import type { Plane } from "../Maths/math.plane";
 import { Constants } from "../Engines/constants";
 
@@ -1069,9 +1069,9 @@ export class Camera extends Node {
         this.getTransformationMatrix();
 
         if (!this._frustumPlanes) {
-            this._frustumPlanes = Frustum.GetPlanes(this._transformMatrix);
+            this._frustumPlanes = GetPlanes(this._transformMatrix);
         } else {
-            Frustum.GetPlanesToRef(this._transformMatrix, this._frustumPlanes);
+            GetPlanesToRef(this._transformMatrix, this._frustumPlanes);
         }
 
         this._refreshFrustumPlanes = false;

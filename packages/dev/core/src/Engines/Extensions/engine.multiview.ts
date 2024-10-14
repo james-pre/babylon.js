@@ -7,7 +7,7 @@ import type { RenderTargetTexture } from "../../Materials/Textures/renderTargetT
 import { Matrix, TmpVectors } from "../../Maths/math.vector";
 import { UniformBuffer } from "../../Materials/uniformBuffer";
 import { MultiviewRenderTarget } from "../../Materials/Textures/MultiviewRenderTarget";
-import { Frustum } from "../../Maths/math.frustum";
+import { GetRightPlaneToRef } from "../../Maths/math.frustum";
 import type { WebGLRenderTargetWrapper } from "../WebGL/webGLRenderTargetWrapper";
 import type { RenderTargetWrapper } from "../renderTargetWrapper";
 import type { AbstractEngine } from "../abstractEngine";
@@ -210,7 +210,7 @@ Scene.prototype._updateMultiviewUbo = function (viewR?: Matrix, projectionR?: Ma
 
     if (viewR && projectionR) {
         viewR.multiplyToRef(projectionR, TmpVectors.Matrix[0]);
-        Frustum.GetRightPlaneToRef(TmpVectors.Matrix[0], this._frustumPlanes[3]); // Replace right plane by second camera right plane
+        GetRightPlaneToRef(TmpVectors.Matrix[0], this._frustumPlanes[3]); // Replace right plane by second camera right plane
     }
 
     if (this._multiviewSceneUbo) {
