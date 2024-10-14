@@ -8,7 +8,7 @@ import type { PointerInfo } from "../../Events/pointerEvents";
 import { PointerEventTypes } from "../../Events/pointerEvents";
 import type { Scene } from "../../scene";
 import { Quaternion } from "../../Maths/math.vector";
-import { Axis } from "../../Maths/math.axis";
+import { axis } from "../../Maths/math.axis";
 import { Tools } from "../../Misc/tools";
 import type { IPointerEvent } from "../../Events/deviceInputEvents";
 /**
@@ -259,7 +259,7 @@ export class FlyCameraMouseInput implements ICameraInput<FlyCamera> {
             })
         ) {
             // Apply change in Radians to vector Angle.
-            rotationChange = Quaternion.RotationAxis(Axis.X, y);
+            rotationChange = Quaternion.RotationAxis(axis.X, y);
             // Apply Pitch to quaternion.
             currentRotation.multiplyInPlace(rotationChange);
         }
@@ -271,7 +271,7 @@ export class FlyCameraMouseInput implements ICameraInput<FlyCamera> {
             })
         ) {
             // Apply change in Radians to vector Angle.
-            rotationChange = Quaternion.RotationAxis(Axis.Y, x);
+            rotationChange = Quaternion.RotationAxis(axis.Y, x);
             // Apply Yaw to quaternion.
             currentRotation.multiplyInPlace(rotationChange);
 
@@ -280,7 +280,7 @@ export class FlyCameraMouseInput implements ICameraInput<FlyCamera> {
             if (camera.bankedTurn && -limit < camera.rotation.z && camera.rotation.z < limit) {
                 const bankingDelta = camera.bankedTurnMultiplier * -x;
                 // Apply change in Radians to vector Angle.
-                rotationChange = Quaternion.RotationAxis(Axis.Z, bankingDelta);
+                rotationChange = Quaternion.RotationAxis(axis.Z, bankingDelta);
                 // Apply Yaw to quaternion.
                 currentRotation.multiplyInPlace(rotationChange);
             }
@@ -293,7 +293,7 @@ export class FlyCameraMouseInput implements ICameraInput<FlyCamera> {
             })
         ) {
             // Apply change in Radians to vector Angle.
-            rotationChange = Quaternion.RotationAxis(Axis.Z, -x);
+            rotationChange = Quaternion.RotationAxis(axis.Z, -x);
             // Track Rolling.
             camera._trackRoll -= x;
             // Apply Pitch to quaternion.

@@ -16,7 +16,7 @@ import { DynamicTexture } from "../../Materials/Textures/dynamicTexture";
 import { CreateCylinder } from "../../Meshes/Builders/cylinderBuilder";
 import { SineEase, EasingFunction } from "../../Animations/easing";
 import { Animation } from "../../Animations/animation";
-import { Axis } from "../../Maths/math.axis";
+import { axis } from "../../Maths/math.axis";
 import { StandardMaterial } from "../../Materials/standardMaterial";
 import { CreateGround } from "../../Meshes/Builders/groundBuilder";
 import { CreateTorus } from "../../Meshes/Builders/torusBuilder";
@@ -922,7 +922,7 @@ export class WebXRMotionControllerTeleportation extends WebXRAbstractFeature {
         cone.isPickable = false;
         cone.scaling.set(0.5, 0.12, 0.2);
 
-        cone.rotate(Axis.X, Math.PI / 2);
+        cone.rotate(axis.X, Math.PI / 2);
 
         cone.position.z = 0.6;
         cone.parent = torus;

@@ -4,7 +4,7 @@ import { Quaternion, Vector3 } from "../Maths/math.vector";
 import { Node } from "../node";
 
 import "./Inputs/freeCameraDeviceOrientationInput";
-import { Axis } from "../Maths/math.axis";
+import { axis } from "../Maths/math.axis";
 
 Node.AddNodeConstructor("DeviceOrientationCamera", (name, scene) => {
     return () => new DeviceOrientationCamera(name, Vector3.Zero(), scene);
@@ -99,7 +99,7 @@ export class DeviceOrientationCamera extends FreeCamera {
      * Reset the camera to its default orientation on the specified axis only.
      * @param axis The axis to reset
      */
-    public resetToCurrentRotation(axis: Axis = Axis.Y): void {
+    public resetToCurrentRotation(axis: Axis = axis.Y): void {
         //can only work if this camera has a rotation quaternion already.
         if (!this.rotationQuaternion) {
             return;

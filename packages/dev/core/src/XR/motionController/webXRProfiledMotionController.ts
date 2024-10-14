@@ -4,7 +4,7 @@ import { WebXRAbstractMotionController } from "./webXRAbstractMotionController";
 import type { Scene } from "../../scene";
 import { SceneLoader } from "../../Loading/sceneLoader";
 import { Mesh } from "../../Meshes/mesh";
-import { Axis, Space } from "../../Maths/math.axis";
+import { axis, Space } from "../../Maths/math.axis";
 import { Color3 } from "../../Maths/math.color";
 import { WebXRControllerComponent } from "./webXRControllerComponent";
 import { CreateSphere } from "../../Meshes/Builders/sphereBuilder";
@@ -135,7 +135,7 @@ export class WebXRProfiledMotionController extends WebXRAbstractMotionController
             rootMesh.setParent(this.rootMesh);
         }
         if (!this.scene.useRightHandedSystem) {
-            this.rootMesh.rotate(Axis.Y, Math.PI, Space.WORLD);
+            this.rootMesh.rotate(axis.Y, Math.PI, Space.WORLD);
         }
     }
 

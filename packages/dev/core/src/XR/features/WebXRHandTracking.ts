@@ -21,7 +21,7 @@ import type { InputBlock } from "../../Materials/Node/Blocks/Input/inputBlock";
 import { Material } from "../../Materials/material";
 import { CreateIcoSphere } from "../../Meshes/Builders/icoSphereBuilder";
 import { TransformNode } from "../../Meshes/transformNode";
-import { Axis } from "../../Maths/math.axis";
+import { axis } from "../../Maths/math.axis";
 import { EngineStore } from "../../Engines/engineStore";
 import { Constants } from "../../Engines/constants";
 import type { WebXRCompositionLayerWrapper } from "./Layers/WebXRCompositionLayer";
@@ -655,7 +655,7 @@ export class WebXRHandTracking extends WebXRAbstractFeature {
 
                 // single change for left handed systems
                 if (!handsDefined && !scene.useRightHandedSystem) {
-                    handGLB.meshes[1].rotate(Axis.Y, Math.PI);
+                    handGLB.meshes[1].rotate(axis.Y, Math.PI);
                 }
             });
 

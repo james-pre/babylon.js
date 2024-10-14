@@ -33,7 +33,7 @@ import { extractMinAndMax } from "../Maths/math.functions";
 import { Color3, Color4 } from "../Maths/math.color";
 import { Epsilon } from "../Maths/math.constants";
 import type { Plane } from "../Maths/math.plane";
-import { Axis } from "../Maths/math.axis";
+import { axis } from "../Maths/math.axis";
 import type { IParticleSystem } from "../Particles/IParticleSystem";
 import { RegisterClass } from "../Misc/typeStore";
 
@@ -2744,7 +2744,7 @@ export abstract class AbstractMesh extends TransformNode implements IDisposable,
      */
     public alignWithNormal(normal: Vector3, upDirection?: Vector3): AbstractMesh {
         if (!upDirection) {
-            upDirection = Axis.Y;
+            upDirection = axis.Y;
         }
 
         const axisX = TmpVectors.Vector3[0];

@@ -4,7 +4,7 @@ import type { Scene } from "../scene";
 import { Matrix, TmpVectors, Vector3 } from "../Maths/math.vector";
 import type { AbstractMesh } from "../Meshes/abstractMesh";
 import { Light } from "./light";
-import { Axis } from "../Maths/math.axis";
+import { axis } from "../Maths/math.axis";
 import type { Nullable } from "core/types";
 /**
  * Interface describing all the common properties and methods a shadow light needs to implement.
@@ -279,7 +279,7 @@ export abstract class ShadowLight extends Light implements IShadowLight {
      */
     public getRotation(): Vector3 {
         this.direction.normalize();
-        const xaxis = Vector3.Cross(this.direction, Axis.Y);
+        const xaxis = Vector3.Cross(this.direction, axis.Y);
         const yaxis = Vector3.Cross(xaxis, this.direction);
         return Vector3.RotationFromAxis(xaxis, yaxis, this.direction);
     }

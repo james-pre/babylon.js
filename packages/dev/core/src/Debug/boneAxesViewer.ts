@@ -4,7 +4,7 @@ import { Vector3 } from "../Maths/math.vector";
 import type { Mesh } from "../Meshes/mesh";
 import type { Bone } from "../Bones/bone";
 import type { Scene } from "../scene";
-import { Axis } from "../Maths/math.axis";
+import { axis } from "../Maths/math.axis";
 
 /**
  * The BoneAxesViewer will attach 3 axes to a specific bone of a specific mesh
@@ -53,9 +53,9 @@ export class BoneAxesViewer extends AxesViewer {
 
         const bone = this.bone;
         bone.getAbsolutePositionToRef(this.mesh, this.pos);
-        bone.getDirectionToRef(Axis.X, this.mesh, this.xaxis);
-        bone.getDirectionToRef(Axis.Y, this.mesh, this.yaxis);
-        bone.getDirectionToRef(Axis.Z, this.mesh, this.zaxis);
+        bone.getDirectionToRef(axis.X, this.mesh, this.xaxis);
+        bone.getDirectionToRef(axis.Y, this.mesh, this.yaxis);
+        bone.getDirectionToRef(axis.Z, this.mesh, this.zaxis);
 
         super.update(this.pos, this.xaxis, this.yaxis, this.zaxis);
     }

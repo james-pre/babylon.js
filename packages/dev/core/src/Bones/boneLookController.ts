@@ -3,7 +3,7 @@ import { BuildArray } from "../Misc/arrayTools";
 import { Vector3, Quaternion, Matrix } from "../Maths/math.vector";
 import type { TransformNode } from "../Meshes/transformNode";
 import type { Bone } from "./bone";
-import { Space, Axis } from "../Maths/math.axis";
+import { Space, axis } from "../Maths/math.axis";
 
 /**
  * Class used to make a bone look toward a point in space
@@ -248,8 +248,8 @@ export class BoneLookController {
             }
 
             if (options.yawAxis != null || options.pitchAxis != null) {
-                let newYawAxis = Axis.Y;
-                let newPitchAxis = Axis.X;
+                let newYawAxis = axis.Y;
+                let newPitchAxis = axis.X;
 
                 if (options.yawAxis != null) {
                     newYawAxis = options.yawAxis.clone();
@@ -429,7 +429,7 @@ export class BoneLookController {
                 if (this._slerping && this._yawRange > Math.PI) {
                     //are we going to be crossing into the min/max region?
                     const boneFwd = BoneLookController._TmpVecs[8];
-                    boneFwd.copyFrom(Axis.Z);
+                    boneFwd.copyFrom(axis.Z);
                     if (this._transformYawPitch) {
                         Vector3.TransformCoordinatesToRef(boneFwd, this._transformYawPitchInv, boneFwd);
                     }

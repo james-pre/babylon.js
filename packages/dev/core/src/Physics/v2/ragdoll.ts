@@ -4,7 +4,7 @@ import type { Scene } from "../../scene";
 import { PhysicsAggregate } from "./physicsAggregate";
 import { PhysicsConstraint } from "./physicsConstraint";
 import type { Mesh } from "../../Meshes/mesh";
-import { Axis, Space } from "core/Maths/math.axis";
+import { axis, Space } from "core/Maths/math.axis";
 import { PhysicsShapeType, PhysicsConstraintType, PhysicsMotionType } from "./IPhysicsEnginePlugin";
 import type { Nullable } from "../../types";
 import type { Bone } from "../../Bones/bone";
@@ -152,7 +152,7 @@ export class Ragdoll {
 
                 // Define the rest of the box properties.
                 currentRagdollBoneProperties.joint = config[i].joint !== undefined ? config[i].joint : this._defaultJoint;
-                currentRagdollBoneProperties.rotationAxis = config[i].rotationAxis !== undefined ? config[i].rotationAxis : Axis.X;
+                currentRagdollBoneProperties.rotationAxis = config[i].rotationAxis !== undefined ? config[i].rotationAxis : axis.X;
                 currentRagdollBoneProperties.min = config[i].min !== undefined ? config[i].min : this._defaultJointMin;
                 currentRagdollBoneProperties.max = config[i].max !== undefined ? config[i].max : this._defaultJointMax;
 
@@ -169,7 +169,7 @@ export class Ragdoll {
                 currentRagdollBoneProperties.boxOffset = boxOffset;
 
                 // Offset axis.
-                const boneOffsetAxis = config[i].boneOffsetAxis !== undefined ? config[i].boneOffsetAxis : Axis.Y;
+                const boneOffsetAxis = config[i].boneOffsetAxis !== undefined ? config[i].boneOffsetAxis : axis.Y;
                 const boneDir = currentBone.getDirection(boneOffsetAxis, this._rootTransformNode);
                 currentRagdollBoneProperties.boneOffsetAxis = boneOffsetAxis;
 

@@ -4,7 +4,7 @@ import { Camera } from "./camera";
 import type { Scene } from "../scene";
 import { Quaternion, Matrix, Vector3, Vector2, TmpVectors } from "../Maths/math.vector";
 import { Epsilon } from "../Maths/math.constants";
-import { Axis } from "../Maths/math.axis";
+import { axis } from "../Maths/math.axis";
 import type { AbstractMesh } from "../Meshes/abstractMesh";
 import { Node } from "../node";
 
@@ -483,10 +483,10 @@ export class TargetCamera extends Camera {
         this.position.addToRef(this._transformedReferencePoint, this._currentTarget);
         if (this.updateUpVectorFromRotation) {
             if (this.rotationQuaternion) {
-                Axis.Y.rotateByQuaternionToRef(this.rotationQuaternion, this.upVector);
+                axis.Y.rotateByQuaternionToRef(this.rotationQuaternion, this.upVector);
             } else {
                 Quaternion.FromEulerVectorToRef(this.rotation, this._tmpQuaternion);
-                Axis.Y.rotateByQuaternionToRef(this._tmpQuaternion, this.upVector);
+                axis.Y.rotateByQuaternionToRef(this._tmpQuaternion, this.upVector);
             }
         }
         this._computeViewMatrix(this.position, this._currentTarget, this.upVector);

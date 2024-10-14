@@ -9,7 +9,7 @@ import type { WebXRControllerComponent } from "../motionController/webXRControll
 import type { Nullable } from "../../types";
 import { Matrix, Vector3 } from "../../Maths/math.vector";
 import { Color3 } from "../../Maths/math.color";
-import { Axis } from "../../Maths/math.axis";
+import { axis } from "../../Maths/math.axis";
 import { StandardMaterial } from "../../Materials/standardMaterial";
 import { CreateCylinder } from "../../Meshes/Builders/cylinderBuilder";
 import { CreateTorus } from "../../Meshes/Builders/torusBuilder";
@@ -517,7 +517,7 @@ export class WebXRControllerPointerSelection extends WebXRAbstractFeature {
                 const deltaFighting = 0.001;
                 controllerData.selectionMesh.position.copyFrom(pick.pickedPoint);
                 if (pickNormal) {
-                    const axis1 = Vector3.Cross(Axis.Y, pickNormal);
+                    const axis1 = Vector3.Cross(axis.Y, pickNormal);
                     const axis2 = Vector3.Cross(pickNormal, axis1);
                     Vector3.RotationFromAxisToRef(axis2, pickNormal, axis1, controllerData.selectionMesh.rotation);
                     controllerData.selectionMesh.position.addInPlace(pickNormal.scale(deltaFighting));

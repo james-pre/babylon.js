@@ -10,7 +10,7 @@ import type { Scene, IDisposable } from "../scene";
 import { DepthSortedParticle, SolidParticle, ModelShape, SolidParticleVertex } from "./solidParticle";
 import type { TargetCamera } from "../Cameras/targetCamera";
 import { BoundingInfo } from "../Culling/boundingInfo";
-import { Axis } from "../Maths/math.axis";
+import { axis } from "../Maths/math.axis";
 import { SubMesh } from "../Meshes/subMesh";
 import type { Material } from "../Materials/material";
 import { StandardMaterial } from "../Materials/standardMaterial";
@@ -1124,7 +1124,7 @@ export class SolidParticleSystem implements IDisposable {
         if (this.billboard) {
             // compute the camera position and un-rotate it by the current mesh rotation
             const tmpVector0 = tempVectors[0];
-            this._camera.getDirectionToRef(Axis.Z, tmpVector0);
+            this._camera.getDirectionToRef(axis.Z, tmpVector0);
             Vector3.TransformNormalToRef(tmpVector0, invertedMatrix, camAxisZ);
             camAxisZ.normalize();
             // same for camera up vector extracted from the cam view matrix

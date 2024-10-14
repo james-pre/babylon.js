@@ -4,7 +4,7 @@ import { Mesh } from "../mesh";
 import { VertexData } from "../mesh.vertexData";
 import { Scene } from "../../scene";
 import type { Nullable } from "../../types";
-import { Axis } from "../../Maths/math.axis";
+import { axis } from "../../Maths/math.axis";
 import { useOpenGLOrientationForUV } from "../../Compat/compatibilityOptions";
 
 /**
@@ -91,7 +91,7 @@ export function CreateCylinderVertexData(options: {
     const ringFirstVertex: Vector3 = Vector3.Zero();
     const ringFirstNormal: Vector3 = Vector3.Zero();
     const quadNormal: Vector3 = Vector3.Zero();
-    const Y: Vector3 = Axis.Y;
+    const Y: Vector3 = axis.Y;
 
     // positions, normals, uvs
     let i: number;
